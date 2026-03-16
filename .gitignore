@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+venv
+ENV
+.env
+.agent/
+# Reflex (Frontend)
+.web/
+backend_port
+.states/
+assets/
+__compiled__/
+
+# Docker
+.docker/
+db/
+postgres_data/
+
+# Databases
+*.sqlite3
+db.sqlite3
+
+# Logs
+*.log
+dash_eval_logs.txt
+dash_logs.txt
+dashboard_crash.txt
+dashboard_crash_v2.txt
+dashboard_full_log.txt
+full_dash_error_logs.txt
+full_dashboard_logs.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project Specific
+tmp/
+Caddyfile.local
+ngrok.log

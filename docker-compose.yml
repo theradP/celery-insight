@@ -1,0 +1,85 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_USER: celery_insight
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: celery_insight_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    ports:
+      - "8080:8000"
+    environment:
+      - DATABASE_URL=postgresql://celery_insight:secretpassword@postgres:5432/celery_insight_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./api:/app/api
+      - ./db:/app/db
+
+  collector:
+    build:
+      context: .
+      dockerfile: docker/collector.Dockerfile
+    environment:
+      # In this demo, the collector monitors the same Redis instance 
+      # that the demo Django app will use as its broker.
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - REDIS_STREAM_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    volumes:
+      - ./collector:/app/collector
+
+  processor:
+    build:
+      context: .
+      dockerfile: docker/processor.Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://celery_insight:secretpassword@postgres:5432/celery_insight_db
+      - REDIS_STREAM_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./processor:/app/processor
+      - ./db:/app/db
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/dashboard.Dockerfile
+    ports:
+      - "3333:3000"
+      - "8888:8000" # Reflex internal backend
+    environment:
+      - INSIGHT_API_URL=http://api:8000
+      - API_URL=http://localhost:8888
+      - REFLEX_BACKEND_PORT=8000
+      - REFLEX_BACKEND_HOST=0.0.0.0
+      - REFLEX_ENV=dev
+    depends_on:
+      - api
+    volumes:
+      - ./dashboard:/app
+
+volumes:
+  postgres_data:
+  redis_data:

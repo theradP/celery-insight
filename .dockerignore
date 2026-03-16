@@ -1,0 +1,15 @@
+**/__pycache__
+**/.pytest_cache
+**/.web
+**/.states
+**/.venv
+**/node_modules
+*.pyc
+*.pyo
+*.pyd
+.db
+.ipynb_checkpoints
+dashboard/.web
+dashboard/.states
+**/.agent
+*.txt
